@@ -2,8 +2,10 @@ let periodo;
 while (periodo != "exit") {
     periodo = 0;
     let montoInicial, cantidadAnios, rendimientoAnual;
+    // El bucle se repite si el input del usuario no puede convertirse a un entero (o float para rendimientoAnual)
     do {
         montoInicial = parseInt(prompt("Ingrese el monto inicial (número entero)"));
+        //Alerta que aparece antes de que se repita el bucle si no pudo convertirse
         if (!montoInicial) {
             alert("Ingrese un número válido");
         }
@@ -22,7 +24,9 @@ while (periodo != "exit") {
     } while (!rendimientoAnual);
     // El periodo se pide dentro de otro bucle, para que se pueda modificar sin necesidad de cargar nuevamente las otras variables.
     while (periodo != "q" && periodo != "exit") {
+        //Mismo mecanismo que en los anteriores, pero la condición para repetir el bucle es que la conversión a entero no se pueda realizar Y que sea diferente de [q] o [exit]
         do {
+            //No se aplica parseInt inicialmente porque se eliminaría [q] o [exit]
             periodo = (prompt("Ingrese el período de interés compuesto en semanas. Para modificar las variables ingrese [q], para salir ingrese [exit]"));
             if (!parseInt(periodo) && periodo != "q" && periodo != "exit") {
                 alert("Ingrese un número válido");
