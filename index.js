@@ -39,7 +39,13 @@ while (periodo != "exit") {
                 resultados.push(variables);
                 // Se muestran los resultados en la consola. 
                 console.log(mostrarResultados(resultados));
-                alert("Gracias por utilizar la app");
+                let orden = prompt("Sí desea obtener los resultados ordenados por período, ingrese [ordenar]");
+                if (orden == "ordenar") {
+                    console.log(mostrarResultados(ordenarResultados(resultados)));
+                    alert("Gracias por utilizar la app");
+                } else {
+                    alert("Gracias por utilizar la app");
+                }
             }
         } while (!parseInt(periodo) && periodo != "q" && periodo != "exit");
         if (periodo != "q" && periodo != "exit") {
@@ -90,4 +96,18 @@ function mostrarResultados(resultados) {
     }
     return informe;
 }
- 
+// Función que ordena los objetos dentro del array que corresponde a la propiedad "casos" del objeto "Variables" por períodos de interés compuesto de menor a mayor
+function ordenarResultados(resultados) {
+    resultadosOrdenados = resultados.concat([]);
+    for (let i = 0; i < resultados.length; i++) {
+        resultadosOrdenados[i]["Casos"].sort((a, b) => {
+            if (a.periodo > b.periodo) {
+                return 1;
+            } else if (a.periodo < b.periodo) {
+                return -1;
+            } 
+            return 0;
+        })
+    }
+    return resultadosOrdenados;
+}
