@@ -1,65 +1,14 @@
-let periodo;
-// Array en el que se van a cargar los resultados (y las variables)
-const resultados = [];
-while (periodo != "exit") {
-    periodo = 0;
-    let montoInicial, cantidadAnios, rendimientoAnual;
-    // El bucle se repite si el input del usuario no puede convertirse a un entero (o float para rendimientoAnual)
-    do {
-        montoInicial = parseInt(prompt("Ingrese el monto inicial (número entero)"));
-        //Alerta que aparece antes de que se repita el bucle si no pudo convertirse
-        if (!montoInicial) {
-            alert("Ingrese un número válido");
-        }
-    } while (!montoInicial);
-    do {
-        cantidadAnios = parseInt(prompt("Ingrese el tiempo en años"));
-        if (!cantidadAnios) {
-            alert("Ingrese un número válido");
-        }
-    } while (!cantidadAnios);
-    do {
-        rendimientoAnual = parseFloat(prompt("Ingrese el rendimiento anual en porcentaje"));
-        if (!rendimientoAnual) {
-            alert("Ingrese un número válido");
-        }
-    } while (!rendimientoAnual);
-    // Se define un objeto con propiedades que corresponden al input que se pidió al usuario, y asignando a las mismas los valores que fueron introducidos. A la última propiedad, casos, se le asigna un array vacío para luego cargar en el mismo los resultados de los cálculos.
-    let variables = {"Monto inicial": montoInicial, "Años de inversión": cantidadAnios, "Rendimiento anual": rendimientoAnual, "Casos": []};
-    // El periodo se pide dentro de otro bucle, para que se pueda modificar sin necesidad de cargar nuevamente las otras variables.
-    while (periodo != "q" && periodo != "exit") {
-        //Mismo mecanismo que en los anteriores, pero la condición para repetir el bucle es que la conversión a entero no se pueda realizar Y que sea diferente de [q] o [exit]
-        do {
-            //No se aplica parseInt inicialmente porque se eliminaría [q] o [exit]
-            periodo = (prompt("Ingrese el período de interés compuesto en semanas. Para modificar las variables ingrese [q], para salir ingrese [exit]"));
-            if (!parseInt(periodo) && periodo != "q" && periodo != "exit") {
-                alert("Ingrese un número válido");
-            } else if (periodo == "exit") {
-                // La línea inferior obedece a que la función se ejecuta dentro del bucle, el "push" que está por fuera se ejecuta posteriormente
-                resultados.push(variables);
-                // Se muestran los resultados en la consola. 
-                console.log(mostrarResultados(resultados));
-                let orden = prompt("Sí desea obtener los resultados ordenados por período, ingrese [ordenar]");
-                if (orden == "ordenar") {
-                    console.log(mostrarResultados(ordenarResultados(resultados)));
-                    alert("Gracias por utilizar la app");
-                } else {
-                    alert("Gracias por utilizar la app");
-                }
-            }
-        } while (!parseInt(periodo) && periodo != "q" && periodo != "exit");
-        if (periodo != "q" && periodo != "exit") {
-            periodo = parseInt(periodo);
-            let montoFinal = interesCompuesto(montoInicial,cantidadAnios,rendimientoAnual,periodo);
-            alert("El monto final será de: " + montoFinal);
-            variables["Casos"].push({periodo: periodo, montoFinal: montoFinal});
-        }
+//Función que calcula el monto final a partir de las variables de los inputs.
+function calcular () {
+    let montoInicial = parseInt(document.getElementById("montoInicial").value);
+    let cantidadAnios = parseInt(document.getElementById("cantidadAnios").value);
+    let rendimientoAnual = parseFloat(document.getElementById("interesAnual").value);
+    let periodo = parseInt(document.getElementById("periodo").value);
+    console.log(montoInicial+cantidadAnios+rendimientoAnual+periodo);
+    if (!(montoInicial+cantidadAnios+rendimientoAnual+periodo)) {
+        resultadoIndividual.innerText = "Ingrese valores válidos en todas las variables";
+        return;
     }
-    resultados.push(variables);
-}
-//Función que devuelve el monto final a partir de: un monto inicial, un tiempo en años, un rendimiento anual y un período de interés compuesto.
-function interesCompuesto(montoInicial,cantidadAnios,rendimientoAnual,periodo) {
-    //Cantidad de semanas en un año
     const semanasAnio = 52.14;
     //Cantidad de períodos totales para el tiempo en años dado, truncado.
     const cantidadPeriodos = Math.floor (cantidadAnios * semanasAnio / periodo);
@@ -70,44 +19,66 @@ function interesCompuesto(montoInicial,cantidadAnios,rendimientoAnual,periodo) {
     for (let i = 0; i < cantidadPeriodos; i++) {
         montoFinal = montoFinal * (rendimientoPeriodo + 1);
     }
-    return montoFinal;
+    montoFinal = montoFinal.toFixed(2);
+    //El resultado calculado se muestra como texto.
+    resultadoIndividual.innerText = `El resultado final será de ${montoFinal} pesos`;
+    return acumular(montoInicial,cantidadAnios,rendimientoAnual,periodo,montoFinal);
 }
-//Función que devuelve una cadena de texto formateada, a partir de las variables introducidas y los resultados calculados
-function mostrarResultados(resultados) {
-    let informe = "";
-    // El largo del array "resultados" es igual a la cantidad de veces que se carguen variables de inicio.
+//Array donde se van a guardar las variables que se vayan ingresando y los resultados.
+const resultados = [];
+function acumular(montoInicial,cantidadAnios,rendimientoAnual,periodo,montoFinal) {
+    let resultado = [montoInicial,cantidadAnios,rendimientoAnual,periodo,montoFinal];
+    resultados.push(resultado);
+}
+// A partir del array resultados, se genera la estructura HTML de una tabla con los datos
+function tablaResultados(){
+    let tablaResultados = "";
     for (let i = 0; i < resultados.length; i++) {
-        // Título para cada caso
-        informe = informe + "\nCaso " + (i+1) + "\n";
-        for (propiedad of Object.keys(resultados[i])) {
-            if (propiedad == "Casos") {
-                // La propiedad "Casos" de un objeto dado en el array "Resultados", tiene como valor un array cuyo largo es igual a la cantidad de períodos diferentes que se hayan ingresado.
-                for (let j = 0; j < resultados[i][propiedad].length; j++) {
-                    informe = informe + "\n- Período de interés compuesto = " + resultados[i][propiedad][j]["periodo"] + " semanas\n";
-                    informe = informe + "- Monto final = " + resultados[i][propiedad][j]["montoFinal"] + "\n";
-                }
-            // Las otras propiedades se pasan a la cadena con su nombre sin modificar, al igual que los valores. En el caso de la propiedad "Rendimiento anual", se agrega un % al final de la cadena.
-            } else if (propiedad == "Rendimiento anual") {
-                informe = informe + `${propiedad} = ${resultados[i][propiedad]}` + "%\n";
-            } else {
-                informe = informe + `${propiedad} = ${resultados[i][propiedad]}` + "\n";
-            }
-        }
+        tablaResultados += `<tr><td>Caso ${i+1}</td><td>${resultados[i][0]}</td><td>${resultados[i][1]}</td><td>${resultados[i][2]}%</td><td>${resultados[i][3]}</td><td>${resultados[i][4]}</td></tr>`
     }
-    return informe;
+    return tablaResultados;
 }
-// Función que ordena los objetos dentro del array que corresponde a la propiedad "casos" del objeto "Variables" por períodos de interés compuesto de menor a mayor
-function ordenarResultados(resultados) {
-    resultadosOrdenados = resultados.concat([]);
-    for (let i = 0; i < resultados.length; i++) {
-        resultadosOrdenados[i]["Casos"].sort((a, b) => {
-            if (a.periodo > b.periodo) {
-                return 1;
-            } else if (a.periodo < b.periodo) {
-                return -1;
-            } 
-            return 0;
-        })
+
+function mostrarResultados() {
+    let datos = tablaResultados();
+    document.getElementById("resultadoGeneral").innerHTML = 
+    `<tr><td></td><td>Monto inicial ($)</td><td>Años de inversión</td><td>Rendimiento anual</td><td>Período de interés compuesto (semanas)</td><td>Monto final ($)</td></tr>${datos}`;
+}
+
+let resultadoIndividual = document.getElementById("resultadoIndividual");
+//Al hacer click en el botón con id calculo, se ejecuta la función calcular
+let calculo = document.getElementById("calculo");
+calculo.addEventListener("click", calcular);
+//Al hacer click en el botón con id botonResultados, se ejecuta la función calcular
+let botonResultados = document.getElementById("botonResultados");
+botonResultados.addEventListener("click", mostrarResultados);
+
+//De presionar "Enter" estando posicionado en cualquiera de los inputs, se ejecutará un "click" en el botón calculo
+let input1 = document.getElementById("montoInicial");
+let input2 = document.getElementById("cantidadAnios");
+let input3 = document.getElementById("interesAnual");
+let input4 = document.getElementById("periodo");
+input1.addEventListener("keypress",function(event) {
+    if (event.key == "Enter") {
+        event.preventDefault();
+        calculo.click();
     }
-    return resultadosOrdenados;
-}
+});
+input2.addEventListener("keypress",function(event) {
+    if (event.key == "Enter") {
+        event.preventDefault();
+        calculo.click();
+    }
+});
+input3.addEventListener("keypress",function(event) {
+    if (event.key == "Enter") {
+        event.preventDefault();
+        calculo.click();
+    }
+});
+input4.addEventListener("keypress",function(event) {
+    if (event.key == "Enter") {
+        event.preventDefault();
+        calculo.click();
+    }
+});

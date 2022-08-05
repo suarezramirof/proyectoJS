@@ -1,0 +1,24 @@
+td {
+    text-align: center;
+    width: 10rem;
+}
+
+.variables {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+}
+
+.contenedor {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    justify-items: center;
+}
+
+.panel {
+    width: 100%;
+}
+
+.display {
+    width: 100%;
+}
